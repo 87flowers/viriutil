@@ -42,7 +42,7 @@ pub fn main() !void {
 }
 
 fn invertEval(x: i16) i16 {
-    if (x == 0x8000) return -0x7FFF;
+    if (x == -0x8000) return 0x7FFF;
     return -x;
 }
 
