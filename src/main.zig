@@ -1,5 +1,5 @@
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
 
@@ -26,19 +26,24 @@ pub fn main() !void {
             std.fs.File.Reader.NoEofError.EndOfStream => return,
             else => return err,
         };
-        if (board.stm == 1) board.eval = -board.eval;
+        if (board.stm == 1) board.eval = invertEval(board.eval);
         try writer.writeStruct(board);
 
         var stm = ~board.stm;
 
         while (true) {
             var move = try reader.readStruct(MoveData);
-            if (stm == 1) move.score = -move.score;
+            if (stm == 1) move.score = invertEval(move.score);
             stm = ~stm;
             try writer.writeStruct(move);
             if (move.move == 0 and move.score == 0) break;
         }
     }
+}
+
+fn invertEval(x: i16) i16 {
+    if (x == 0x8000) return -0x7FFF;
+    return -x;
 }
 
 const PackedBoard = packed struct {
